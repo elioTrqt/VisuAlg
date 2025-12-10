@@ -6,6 +6,27 @@ import { ForLoop } from "./algorithm/forloop.ts";
 import { WhileLoop } from "./algorithm/whileloop.ts";
 import * as pseudo from "./algorithm/statement.ts";
 import * as d3 from "d3";
+import { renderToString } from "katex";
+
+function renderMathString(input: string) {
+  // 1. Temporarily replace escaped \$ with a placeholder
+  input = input.replace(/\\\$/g, "__DOLLAR__");
+
+  // 2. Render $$...$$ (block math)
+  input = input.replace(/\$\$([\s\S]+?)\$\$/g, (_: string, tex: string) => {
+    return renderToString(tex.trim(), { displayMode: true });
+  });
+
+  // 3. Render $...$ (inline math)
+  input = input.replace(/(?<!\\)\$([^$]+?)\$/g, (_: string, tex: string) => {
+    return renderToString(tex.trim(), { displayMode: false });
+  });
+
+  // 4. Restore literal $
+  input = input.replace(/__DOLLAR__/g, "$");
+
+  return input;
+}
 
 const container = document.getElementById("app");
 container!.style.color = "black";
@@ -17,7 +38,7 @@ alg.appendStatement(
     stack.list[0] = 2;
     console.log(stack.list);
     return false;
-  }, "list[0] <- 2;"),
+  }, "$list[0] \\gets 2$"),
 );
 
 const for_init = (stack: any) => {
@@ -32,7 +53,7 @@ const for_exit = (stack: any) => {
   delete stack.i;
   return true;
 };
-const for_display = "i from 1 to 6";
+const for_display = "$i$ from 1 to 6";
 const for_loop = new ForLoop(for_display, for_loop_through, for_init, for_exit);
 
 for_loop.appendStatement(
@@ -40,14 +61,14 @@ for_loop.appendStatement(
     stack.list[stack.i] = stack.list[stack.i - 1] * 2;
     console.log(stack);
     return false;
-  }, "list[i] <- list[i-1]*2"),
+  }, "$list[i] \\gets list[i-1]\\cdot 2$"),
 );
 for_loop.appendStatement(
   new pseudo.Statement((stack: any) => {
     stack.list[stack.i] = stack.list[stack.i] + 2;
     console.log(stack);
     return false;
-  }, "list[i] <- list[i]+2"),
+  }, "$list[i] \\gets list[i]+2$"),
 );
 
 // alg.appendStatement(for_loop);
@@ -56,17 +77,17 @@ alg.appendStatement(
   new pseudo.Statement((stack) => {
     stack.caca = 5;
     return false;
-  }, "caca <- 5;"),
+  }, "$caca \\gets 5$"),
 );
 
-const while_loop = new WhileLoop("caca > 2", (stack) => {
+const while_loop = new WhileLoop("$caca \\geq 3$", (stack) => {
   return stack.caca > 2;
 });
 while_loop.appendStatement(
   new pseudo.Statement((stack) => {
     stack.caca = stack.caca - 1;
     return false;
-  }, "caca <- caca - 1;"),
+  }, "$caca \\gets caca - 1$"),
 );
 while_loop.appendStatement(for_loop);
 
@@ -90,6 +111,12 @@ button.onclick = (_) => {
   alg_pseudo.next();
 };
 app?.appendChild(button);
+
+Array.from(document.getElementsByClassName("ps-line")).forEach(
+  (line: Element) => {
+    line.innerHTML = renderMathString(line.innerHTML);
+  },
+);
 
 (window as any).for_loop = for_loop;
 (window as any).alg = alg_pseudo;
