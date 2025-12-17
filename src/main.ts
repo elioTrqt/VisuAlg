@@ -4,6 +4,12 @@ import { SWTable } from "./graphics/sw_graphics.ts";
 import { SWAlg } from "./sw_alg.ts";
 import { ForLoop } from "./algorithm/forloop.ts";
 import { WhileLoop } from "./algorithm/whileloop.ts";
+import {
+  IfStatement,
+  ConditionalStatement,
+  ElseStatement,
+  ElseIfStatement,
+} from "./algorithm/ifstatement.ts";
 import * as pseudo from "./algorithm/statement.ts";
 import * as d3 from "d3";
 import { renderToString } from "katex";
@@ -80,6 +86,29 @@ alg.appendStatement(
   }, "$caca \\gets 5$"),
 );
 
+alg.appendStatement(
+  new pseudo.Statement((stack) => {
+    stack.a = 6;
+    return false;
+  }, "$a \\gets 6$"),
+);
+
+const if_cond = new ConditionalStatement();
+const if_clause = new IfStatement(
+  new pseudo.Statement((stack: any) => {
+    return stack.a >= 4;
+  }, "$a \\geq 4$"),
+  if_cond.tail,
+);
+if_clause.appendStatement(
+  new pseudo.Statement((stack: any) => {
+    stack.a *= 2;
+    return false;
+  }, "$a \\gets a \\cdot 2$"),
+);
+if_cond.appendStatement(if_clause);
+alg.appendStatement(if_cond);
+
 const while_loop = new WhileLoop("$caca \\geq 3$", (stack) => {
   return stack.caca > 2;
 });
@@ -92,7 +121,6 @@ while_loop.appendStatement(
 while_loop.appendStatement(for_loop);
 
 alg.appendStatement(while_loop);
-
 const alg_pseudo = new pseudo.Algorithm(
   "Quicksort (not really)",
   "$a$ an integer value to initialize, $n$ the size of the outputed list",
@@ -122,3 +150,5 @@ Array.from(document.getElementsByClassName("ps-line")).forEach(
 (window as any).alg = alg_pseudo;
 (window as any).Vector = Vector;
 (window as any).Cell = Cell;
+(window as any).cond = if_cond;
+(window as any).clause = if_clause;
