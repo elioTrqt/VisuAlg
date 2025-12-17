@@ -36,13 +36,11 @@ export abstract class LoopStatement implements IStatement {
   // got to tail to end loop otherwise
   protected enterLoop(stack: any): void {
     console.log("entering loop");
-    this.block.reset();
     this.highlight(false);
     const go_in = this.init(stack);
     // const go_in = this.head.next(stack);
     if (go_in) {
       this.step = 2;
-      this.block.reset();
       this.block.highlight(true);
     } else {
       this.step = 3;
@@ -57,7 +55,6 @@ export abstract class LoopStatement implements IStatement {
     this.head.highlight(false);
     if (this.head.next(stack)) {
       this.step = 2;
-      this.block.reset();
       this.block.highlight(true);
     } else {
       this.step = 3;
@@ -113,8 +110,7 @@ export abstract class LoopStatement implements IStatement {
     this.block.appendStatement(s);
   }
 
-  reset(): void {
+  exit(): void {
     this.step = 0;
-    this.block.reset();
   }
 }

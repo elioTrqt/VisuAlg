@@ -14,7 +14,7 @@ export interface IStatement {
   // highlighting a for loop will highlight the header (condition) of the loop
   highlight: (val: boolean) => void;
 
-  reset: () => void;
+  exit: (stack: any) => void;
 }
 
 export class Statement implements IStatement {
@@ -42,13 +42,15 @@ export class Statement implements IStatement {
     }
   }
 
-  reset() {}
+  exit() {}
 }
 
 export class BlockStatement implements IStatement {
   step: number = 0;
   container: HTMLElement;
   statements: Array<IStatement> = [];
+
+  exit_calls: Array<(_: any) => void> = [];
 
   constructor(statements: Array<Statement> = []) {
     this.container = document.createElement("div");
@@ -68,6 +70,7 @@ export class BlockStatement implements IStatement {
         this.statements[this.step].highlight(true);
         return true;
       } else {
+        this.exit(stack);
         return false;
       }
     }
@@ -83,10 +86,17 @@ export class BlockStatement implements IStatement {
     this.container.appendChild(s.container);
   }
 
-  reset(): void {
+  exit(stack: any): void {
     this.step = 0;
-    this.statements.forEach((s) => {
-      s.reset();
+    for (const c of this.exit_calls) {
+      c(stack);
+    }
+  }
+
+  // helper to remove out of scope variables
+  free(key: string): void {
+    this.exit_calls.push((stack: any) => {
+      delete stack[key];
     });
   }
 }
@@ -177,7 +187,7 @@ export class Algorithm {
 
   next(): boolean {
     if (this.step == 0) {
-      this.block.reset();
+      this.block.exit();
       this.step = 1;
       this.start.style.backgroundColor = "yellow";
     } else if (this.step == 1) {
