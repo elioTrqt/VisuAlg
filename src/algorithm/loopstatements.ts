@@ -78,7 +78,7 @@ export abstract class LoopStatement implements IStatement {
     console.log("exiting loop");
     this.tail.highlight(false);
     this.tail.next(stack);
-    this.step = 0;
+    this.exit(stack);
   }
 
   next(stack: any): boolean {
@@ -110,7 +110,7 @@ export abstract class LoopStatement implements IStatement {
     this.block.appendStatement(s);
   }
 
-  exit(): void {
+  exit(_: any): void {
     this.step = 0;
   }
 }
