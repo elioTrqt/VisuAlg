@@ -52,11 +52,12 @@ export class BlockStatement implements IStatement {
 
   exit_calls: Array<(_: any) => void> = [];
 
-  constructor(statements: Array<Statement> = []) {
+  constructor(statements: Array<IStatement> = []) {
     this.container = document.createElement("div");
     this.container.classList.add("alg-block-statement");
     this.container.classList.add("ps-block");
     this.container.style.marginLeft = "1.2em";
+		this.statements = statements;
     for (let a of statements) {
       this.container.appendChild(a.container);
     }
@@ -187,7 +188,6 @@ export class Algorithm {
 
   next(): boolean {
     if (this.step == 0) {
-      this.block.exit();
       this.step = 1;
       this.start.style.backgroundColor = "yellow";
     } else if (this.step == 1) {
