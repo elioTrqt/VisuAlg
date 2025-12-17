@@ -28,6 +28,7 @@ export class ConditionalStatement extends BlockStatement {
         return true;
       } else {
         this.step++;
+        this.statements[this.step].highlight(true);
         return true;
       }
     } else {

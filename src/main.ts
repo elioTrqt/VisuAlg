@@ -88,16 +88,16 @@ alg.appendStatement(
 
 alg.appendStatement(
   new pseudo.Statement((stack) => {
-    stack.a = 6;
+    stack.a = 11;
     return false;
-  }, "$a \\gets 6$"),
+  }, "$a \\gets 11$"),
 );
 
 const if_cond = new ConditionalStatement();
 const if_clause = new IfStatement(
   new pseudo.Statement((stack: any) => {
-    return stack.a >= 4;
-  }, "$a \\geq 4$"),
+    return stack.a >= 10;
+  }, "$a \\geq 10$"),
   if_cond.tail,
 );
 if_clause.appendStatement(
@@ -107,6 +107,30 @@ if_clause.appendStatement(
   }, "$a \\gets a \\cdot 2$"),
 );
 if_cond.appendStatement(if_clause);
+
+const else_if_clause = new ElseIfStatement(
+  new pseudo.Statement((stack: any) => {
+    return stack.a >= 5;
+  }, "$a \\geq 5$"),
+  if_cond.tail,
+);
+else_if_clause.appendStatement(
+  new pseudo.Statement((stack: any) => {
+    stack.a *= 4;
+    return false;
+  }, "$a \\gets a \\cdot 4$"),
+);
+if_cond.appendStatement(else_if_clause);
+
+const else_clause = new ElseStatement(if_cond.tail);
+else_clause.appendStatement(
+  new pseudo.Statement((stack: any) => {
+    stack.a *= 1000;
+    return false;
+  }, "$a \\gets a \\cdot 1000$"),
+);
+if_cond.appendStatement(else_clause);
+
 alg.appendStatement(if_cond);
 
 const while_loop = new WhileLoop("$caca \\geq 3$", (stack) => {

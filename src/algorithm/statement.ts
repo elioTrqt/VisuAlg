@@ -57,7 +57,7 @@ export class BlockStatement implements IStatement {
     this.container.classList.add("alg-block-statement");
     this.container.classList.add("ps-block");
     this.container.style.marginLeft = "1.2em";
-		this.statements = statements;
+    this.statements = statements;
     for (let a of statements) {
       this.container.appendChild(a.container);
     }
